@@ -2,12 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router } from "react-router-dom";
 import "./index.css";
-import { JobViz } from "../src/components/JobViz";
+import { JobVizHost } from "./components/JobVizHost";
 // import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <Router>
-    <JobViz />
+    <JobVizHost />
   </Router>,
   document.getElementById("root")
 );
