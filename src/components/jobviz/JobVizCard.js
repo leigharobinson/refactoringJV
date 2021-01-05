@@ -2,19 +2,16 @@ import React, { useState, useEffect } from "react";
 import { makeUrlPath } from "../Helper";
 
 export const JobVizCard = (props) => {
-  // const [urlTitle, setUrlTitle] = useState({});
-  const child = props.child;
-  // console.log(child);
-  // console.log(child.parent[0]);
-  // const childTitleUrl = makeUrlPath(props.child.ttl);
-  // setUrlTitle(childTitleUrl);
+  const job = props.job;
+  // console.log("ISEEEYOU", job);
 
   return (
     <>
+      {/* <h1>HWOOWOW</h1> */}
       <div
         className="jobviz-parent-card"
         onClick={() => {
-          props.history.push(`/jobviz/${child}/${child}`);
+          props.history.push(`/jobviz/${job.id}/`);
         }}
       >
         <div className="btn-container">
@@ -22,8 +19,8 @@ export const JobVizCard = (props) => {
             +
           </div>
         </div>
-        <div id={child.id} className="listed-categories">
-          {child.title}
+        <div id={job.id} className="listed-categories">
+          {job.title}
         </div>
       </div>
     </>
