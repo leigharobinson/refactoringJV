@@ -1,6 +1,6 @@
 import { Route, Switch } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-import { JobVizList } from "../components/jobviz/JobVizList";
+import { JobVizList } from "./jobviz/JobVizList";
 
 export const ApplicationViews = (props) => {
   const originalJobs = props.originalJobs;
@@ -21,18 +21,18 @@ export const ApplicationViews = (props) => {
 
   const findParent = (job, nodes) => {
     // console.log(nodes);
-    const parent = [];
+    const holdParent = [];
     const h = job.Hierarchy;
+    const p = h - 1;
+    const level = `Level${p}`;
 
     nodes.forEach((n) => {
-      for (let i = 1; i <= n.children.length; i++) {
-        if (n.children[i] === job.id && n.Hierarchy === h - 1) {
-          parent.push(n.id);
-        }
+      if (n.Hierarchy === h - 1 && n.ttl === job[level]) {
+        holdParent.push(n.id);
       }
     });
     // console.log(parent);
-    return parent;
+    return holdParent;
   };
 
   const addChildrenAndParentToJobs = (originalJobs) => {
