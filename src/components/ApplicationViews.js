@@ -1,41 +1,95 @@
 import { Route, Switch } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { JobVizList } from "../components/jobviz/JobVizList";
-import JobManager from "../components/modules/JobManager";
 
-export const ApplicationViews = () => {
+export const ApplicationViews = (props) => {
+  const originalJobs = props.originalJobs;
   const [jobs, setJobs] = useState([]);
 
-  useEffect(() => {
-    JobManager.getAll().then((jobs) => {
-      setJobs(jobs);
+  const findChildren = (parent, nodes) => {
+    const children = [];
+    const h = parent.Hierarchy;
+    const level = `Level${h}`;
+    nodes.forEach((n) => {
+      if (n.Hierarchy === h + 1 && parent.ttl === n[level]) {
+        children.push(n["id"]);
+      }
     });
-  }, []);
+    // console.log("children", children);
+    return children;
+  };
+
+  const findParent = (job, nodes) => {
+    // console.log(nodes);
+    const parent = [];
+    const h = job.Hierarchy;
+
+    nodes.forEach((n) => {
+      for (let i = 1; i <= n.children.length; i++) {
+        if (n.children[i] === job.id && n.Hierarchy === h - 1) {
+          parent.push(n.id);
+        }
+      }
+    });
+    // console.log(parent);
+    return parent;
+  };
+
+  const addChildrenAndParentToJobs = (originalJobs) => {
+    const jobWithChildren = [];
+    const jobWithParent = [];
+    originalJobs.forEach((job) => {
+      job["children"] = findChildren(job, originalJobs);
+
+      // console.log(job["children"]);
+      jobWithChildren.push(job);
+    });
+    // console.log(jobWithChildren);
+    jobWithChildren.forEach((job) => {
+      job["parent"] = findParent(job, jobWithChildren);
+
+      jobWithParent.push(job);
+    });
+    // console.log(jobWithParent);
+    setJobs(jobWithParent);
+  };
+
+  useEffect(() => {
+    // console.log("original Jobs", originalJobs);
+    addChildrenAndParentToJobs(originalJobs);
+  }, [originalJobs]);
 
   return (
     <React.Fragment>
       <Switch>
         <Route
           exact
-          path="/jobs"
+          path="/jobviz"
           render={(props) => {
             return <JobVizList jobs={jobs} {...props} />;
           }}
         />
         <Route
           exact
-          path="/jobs/job-catagories"
-          render={(props) => {
-            return <JobVizList jobs={jobs} {...props} />;
-          }}
-        />
-        <Route
-          exact
-          path="/jobs/job-catagories/:jobsId(\d+)"
+          path="/jobviz/:parent"
           render={(props) => {
             return (
               <JobVizList
-                jobsId={parseInt(props.match.params.jobId)}
+                jobs={jobs}
+                parent={props.match.params.parent}
+                {...props}
+              />
+            );
+          }}
+        />
+        <Route
+          exact
+          path="/jobviz/:parentId(\d+)/:parent"
+          render={(props) => {
+            return (
+              <JobVizList
+                parentId={parseInt(props.match.params.parentId)}
+                parent={props.match.params.parent}
                 jobs={jobs}
                 {...props}
               />

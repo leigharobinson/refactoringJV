@@ -1,72 +1,31 @@
 import React, { useState, useEffect } from "react";
+import { JobVizCard } from "./JobVizCard";
 import "../styling/Style.css";
 
 export const JobVizList = (props) => {
   const jobs = props.jobs;
-  const [clicked, setClicked] = useState(false);
-  const [parentId, setParentId] = useState(0);
-  const [childrenId, setChildrenId] = useState([]);
-  const [jobObj, setJobObj] = useState({
-    id: 0,
-    title: "",
-    Hierarchy: "",
-    OccupationType: "",
-    Employment2016: 0,
-    Employment2026: 0,
-    ChgEmploy2016to26Num: 0,
-    ChgEmploy2016to26Perc: 0,
-    PercentSelfEmployed2016: 0,
-    OccupationalOpenings2016to2026AnnualAverage: 0,
-    MedianAnnualWage2017: "",
-    TypicalEducationNeededForEntr: "",
-    WorkExperienceInARelatedOccupation: "",
-    TypicalOnTheJobTrainingNeededToAttainCompetencyInTheOccupation: "",
-    ttl: "",
-    Level0: "",
-    Level4: "",
-    Level3: "",
-    Level2: "",
-    Level1: "",
-    pathString: "",
-    Def: "",
-  });
+  console.log("JObs", jobs);
 
-  const findId = () => {
-    if (props.selectedId !== undefined) {
-      setParentId(props.selectedId);
+  const [treeRoot, setTreeRoot] = useState(true);
+  const [clicked, setClicked] = useState(false);
+  const [parentId, setParentId] = useState(1);
+  const [childId, setChildId] = useState(0);
+
+  const getIdOfJob = () => {
+    let i = 0;
+    if (clicked === true && i === 0) {
+      i += 1;
+      setParentId(1);
+    } else if (clicked === true && i > 0) {
+      setParentId(1);
+    } else {
+      setParentId(0);
     }
   };
 
-  const findChildren = (parent, nodes) => {
-    const children = [];
-    const h = parent["Hierarchy"];
-    const level = `Level${h}`;
-    nodes.forEach((n) => {
-      if (n["Hierarchy"] === h + 1 && parent["ttl"] === n[level]) {
-        children.push(n["id"]);
-      }
-    });
-    setChildrenId(children);
-    return children;
-  };
-
-  const getChildrenResulets = () => {
-    jobs.forEach((job) => {
-      if (job.id === parentId) {
-        setJobObj(job);
-        job["children"] = findChildren(job, jobs);
-      }
-    });
-  };
-
   useEffect(() => {
-    getChildrenResulets();
-    findId();
-  }, [jobs, parentId]);
-
-  useEffect(() => {
-    console.log(childrenId);
-  }, [childrenId]);
+    setParentId(1);
+  }, [parentId]);
 
   return (
     <>
@@ -83,12 +42,14 @@ export const JobVizList = (props) => {
             onClick={() => {
               if (clicked === false) {
                 setClicked(true);
-                setParentId(1);
-                props.history.push("/jobs/job-catagories");
+                getIdOfJob();
+                setTreeRoot(false);
+                props.history.push(`/jobviz/${jobs[0].title}`);
               } else {
                 setClicked(false);
-                setParentId(0);
-                props.history.push("/jobs");
+                getIdOfJob();
+                setTreeRoot(true);
+                props.history.push("/jobviz");
               }
             }}
           >
@@ -96,10 +57,42 @@ export const JobVizList = (props) => {
               <div type="button" className="link-btn">
                 +
               </div>
-
               <p>Jobs</p>
             </div>
           </div>
+
+          {!treeRoot ? (
+            <div className="jobs-parent">
+              <div className="container-cards">
+                {jobs.map((child, i) => {
+                  if (parentId === child.id) {
+                    for (let i = 0; i <= child.children.length; i++) {
+                      if (child.children[i] === child.id) {
+                        return (
+                          <div
+                            key={i}
+                            // onClick={() => setChildId(child.id)}
+                            className="option"
+                          >
+                            <JobVizCard
+                              key={child}
+                              child={child}
+                              jobs={jobs}
+                              {...props}
+                            />
+                          </div>
+                        );
+                      }
+                    }
+                  }
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="jobs-parent">
+              <div className="container-cards"></div>
+            </div>
+          )}
         </div>
       </div>
     </>
