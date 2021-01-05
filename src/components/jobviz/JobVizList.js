@@ -3,7 +3,39 @@ import "../styling/Style.css";
 
 export const JobVizList = (props) => {
   const jobs = props.jobs;
-  const level1 = props.level1;
+  const [clicked, setClicked] = useState(false);
+  const [parentId, setParentId] = useState(0);
+  const [childrenId, setChildrenId] = useState([]);
+  const [jobObj, setJobObj] = useState({
+    id: 0,
+    title: "",
+    Hierarchy: "",
+    OccupationType: "",
+    Employment2016: 0,
+    Employment2026: 0,
+    ChgEmploy2016to26Num: 0,
+    ChgEmploy2016to26Perc: 0,
+    PercentSelfEmployed2016: 0,
+    OccupationalOpenings2016to2026AnnualAverage: 0,
+    MedianAnnualWage2017: "",
+    TypicalEducationNeededForEntr: "",
+    WorkExperienceInARelatedOccupation: "",
+    TypicalOnTheJobTrainingNeededToAttainCompetencyInTheOccupation: "",
+    ttl: "",
+    Level0: "",
+    Level4: "",
+    Level3: "",
+    Level2: "",
+    Level1: "",
+    pathString: "",
+    Def: "",
+  });
+
+  const findId = () => {
+    if (props.selectedId !== undefined) {
+      setParentId(props.selectedId);
+    }
+  };
 
   const findChildren = (parent, nodes) => {
     const children = [];
@@ -14,30 +46,27 @@ export const JobVizList = (props) => {
         children.push(n["id"]);
       }
     });
-    if (children.length !== 0) {
-      console.log(
-        "Level1:",
-        parent.Level1,
-        "Level2",
-        parent.Level2,
-        "Level3",
-        parent.Level3,
-        level,
-        parent.ttl,
-        children
-      );
-    }
+    setChildrenId(children);
     return children;
   };
+
   const getChildrenResulets = () => {
     jobs.forEach((job) => {
-      job["children"] = findChildren(job, jobs);
+      if (job.id === parentId) {
+        setJobObj(job);
+        job["children"] = findChildren(job, jobs);
+      }
     });
   };
 
   useEffect(() => {
     getChildrenResulets();
-  }, [jobs]);
+    findId();
+  }, [jobs, parentId]);
+
+  useEffect(() => {
+    console.log(childrenId);
+  }, [childrenId]);
 
   return (
     <>
@@ -52,8 +81,15 @@ export const JobVizList = (props) => {
           <div
             className="option"
             onClick={() => {
-              props.history.push("/jobs/job-catagories");
-              // console.log("you clicked me");
+              if (clicked === false) {
+                setClicked(true);
+                setParentId(1);
+                props.history.push("/jobs/job-catagories");
+              } else {
+                setClicked(false);
+                setParentId(0);
+                props.history.push("/jobs");
+              }
             }}
           >
             <div className="jobviz-parent-card">

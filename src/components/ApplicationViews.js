@@ -5,10 +5,6 @@ import JobManager from "../components/modules/JobManager";
 
 export const ApplicationViews = () => {
   const [jobs, setJobs] = useState([]);
-  const level1 = 1;
-  const level2 = 2;
-  const level3 = 3;
-  const level4 = 4;
 
   useEffect(() => {
     JobManager.getAll().then((jobs) => {
@@ -30,7 +26,7 @@ export const ApplicationViews = () => {
           exact
           path="/jobs/job-catagories"
           render={(props) => {
-            return <JobVizList level1={level1} jobs={jobs} {...props} />;
+            return <JobVizList jobs={jobs} {...props} />;
           }}
         />
         <Route
