@@ -3,8 +3,10 @@ import { makeUrlPath } from "../Helper";
 
 export const JobVizCard = (props) => {
   const job = props.job;
-  // console.log("ISEEEYOU", job);
-  console.log(job);
+
+  const level0 = job.parent[0];
+  const parent = job.id;
+  // console.log(end);
 
   return (
     <>
@@ -12,7 +14,7 @@ export const JobVizCard = (props) => {
       <div
         className="jobviz-parent-card"
         onClick={() => {
-          props.history.push(`/jobviz/${job.parent[0]}/${job.id}/`);
+          props.history.push(`/jobviz/${level0}/${parent}`);
         }}
       >
         <div className="btn-container">
